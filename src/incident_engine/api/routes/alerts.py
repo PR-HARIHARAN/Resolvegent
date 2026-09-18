@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 import requests
 
 import asyncio
+from incident_engine.core.config import config
 from incident_engine.core.database import get_db
 from incident_engine.core.models_db import AlertDB
 from incident_engine.core.agent_runner import run_autonomous_agent, get_active_agent_state
@@ -161,12 +162,13 @@ async def get_agent_status_endpoint():
 
 @router.post("/alerts/pull-from-engine")
 async def pull_alerts_from_engine(
-    engine_url: str = Query(default="http://localhost:8001/api/alerts?limit=50&order=desc"),
+    engine_url: Optional[str] = Query(default=None),
     db: Session = Depends(get_db)
 ):
     """Directly fetch and ingest latest alerts from the E-Commerce Alert Engine."""
+    target_url = engine_url or f"{config.ALERT_ENGINE_URL.rstrip('/')}/api/alerts?limit=50&order=desc"
     try:
-        resp = requests.get(engine_url, timeout=5)
+        resp = requests.get(target_url, timeout=5)
         if resp.status_code != 200:
             return {"status": "error", "message": f"Alert engine returned status {resp.status_code}"}
         

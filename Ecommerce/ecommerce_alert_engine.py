@@ -1654,12 +1654,12 @@ def main():
     global current_engine_instance
     parser = argparse.ArgumentParser(description="E-commerce 3-Incident Alert Engine + Log API")
     parser.add_argument("--output", type=str, default="alerts.jsonl", help="Output file (default: alerts.jsonl)")
-    parser.add_argument("--port", type=int, default=8001, help="HTTP port (default: 8001)")
+    parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8001)), help="HTTP port (default: 8001 or $PORT)")
     parser.add_argument(
         "--backend-url",
         type=str,
-        default="http://localhost:8000/api/v1/alerts/ingest",
-        help="Backend ingest URL (default: http://localhost:8000/api/v1/alerts/ingest)"
+        default=os.environ.get("BACKEND_URL", "http://localhost:8000/api/v1/alerts/ingest"),
+        help="Backend ingest URL (default: http://localhost:8000/api/v1/alerts/ingest or $BACKEND_URL)"
     )
 
     args = parser.parse_args()

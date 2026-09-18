@@ -1,0 +1,37 @@
+services:
+  # 1. Resolvegent Core Autonomous Incident Engine Backend (FastAPI + LangGraph)
+  - type: web
+    name: resolvegent-api
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python -c \"from langchain_huggingface import HuggingFaceEmbeddings; HuggingFaceEmbeddings(model_name='BAAI/bge-small-en-v1.5')\""
+    startCommand: "python -m uvicorn incident_engine.api.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: PYTHONPATH
+        value: ./src
+      - key: GROQ_API_KEY
+        sync: false # Set in Render Dashboard
+      - key: LLM_MODEL
+        value: qwen-2.5-32b
+      - key: EMBEDDING_MODEL
+        value: BAAI/bge-small-en-v1.5
+      - key: ALERT_ENGINE_URL
+        sync: false # e.g. https://ecommerce-alerts.onrender.com
+
+  # 2. Synthetic E-Commerce Alert Engine (Port 8001 Simulator)
+  - type: web
+    name: ecommerce-alerts
+    env: python
+    region: oregon
+    plan: free
+    rootDir: Ecommerce
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python ecommerce_alert_engine.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: BACKEND_URL
+        sync: false # e.g. https://resolvegent-api.onrender.com/api/v1/alerts/ingest

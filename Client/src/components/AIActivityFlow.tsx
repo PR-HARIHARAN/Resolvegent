@@ -2,6 +2,8 @@ import * as React from 'react'
 import { fetchAuditEvents, fetchAgentStatus, type AgentStatusResponse } from '@/api/client'
 import type { AuditEvent } from '@/types'
 
+const ALERT_ENGINE_URL = import.meta.env.VITE_ALERT_ENGINE_URL || 'http://localhost:8001'
+
 interface AIActivityFlowProps {
   onSimulationStatusChange?: (
     status: 'IDLE' | 'RUNNING' | 'COMPLETED',
@@ -110,7 +112,7 @@ export const AIActivityFlow: React.FC<AIActivityFlowProps> = ({
         {/* Live connected status badge */}
         <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-500">
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span>Backend Connected (Port 8000)</span>
+          <span>Backend Connected</span>
         </div>
       </div>
 
@@ -125,7 +127,7 @@ export const AIActivityFlow: React.FC<AIActivityFlowProps> = ({
             <span className="text-zinc-300 font-medium">Incident 2</span>, or{' '}
             <span className="text-zinc-300 font-medium">Incident 3</span> from the{' '}
             <a
-              href="http://localhost:8001"
+              href={ALERT_ENGINE_URL}
               target="_blank"
               rel="noreferrer"
               className="text-zinc-300 underline hover:text-white"

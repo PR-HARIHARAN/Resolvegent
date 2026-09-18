@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
 import requests
+from incident_engine.core.config import config as app_config
 from incident_engine.core.database import SessionLocal, get_db
 from incident_engine.core.models_db import IncidentDB, AlertDB, AuditEventDB
 from incident_engine.core.knowledge_base import kb_vectorstore
@@ -95,9 +96,9 @@ async def reset_simulation(db: Session = Depends(get_db)):
     _active_agent_state["current_incident_title"] = None
     _active_agent_state["last_updated"] = datetime.now(timezone.utc).isoformat()
 
-    # 4. Clear alert engine buffered alerts on port 8001 if reachable
+    # 4. Clear alert engine buffered alerts if reachable
     try:
-        requests.post("http://localhost:8001/api/clear", timeout=2)
+        requests.post(f"{app_config.ALERT_ENGINE_URL.rstrip('/')}/api/clear", timeout=2)
     except Exception:
         pass
 

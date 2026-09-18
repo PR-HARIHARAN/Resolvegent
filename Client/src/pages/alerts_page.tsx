@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import { fetchAlerts } from '@/api/client'
 import type { Alert } from '@/types'
 
+const ALERT_ENGINE_URL = import.meta.env.VITE_ALERT_ENGINE_URL || 'http://localhost:8001'
+const STOREFRONT_URL = import.meta.env.VITE_STOREFRONT_URL || 'http://localhost:3000'
+
 export const AlertsPage: React.FC = () => {
   const [alerts, setAlerts] = React.useState<Alert[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
@@ -33,7 +36,7 @@ export const AlertsPage: React.FC = () => {
             Raw Telemetry & Signals
           </h1>
           <p className="text-xs text-zinc-400">
-            Real inbound metrics, logs, and alerts ingested from E-Commerce Alert Engine (port 8001)
+            Real inbound metrics, logs, and alerts ingested from E-Commerce Alert Engine
           </p>
         </div>
 
@@ -59,7 +62,7 @@ export const AlertsPage: React.FC = () => {
           <p className="text-xs text-zinc-500 max-w-md mx-auto leading-relaxed">
             Trigger an incident from the{' '}
             <a
-              href="http://localhost:8001"
+              href={ALERT_ENGINE_URL}
               target="_blank"
               rel="noreferrer"
               className="text-zinc-300 underline hover:text-white"
@@ -68,7 +71,7 @@ export const AlertsPage: React.FC = () => {
             </a>{' '}
             or the{' '}
             <a
-              href="http://localhost:3000"
+              href={STOREFRONT_URL}
               target="_blank"
               rel="noreferrer"
               className="text-zinc-300 underline hover:text-white"

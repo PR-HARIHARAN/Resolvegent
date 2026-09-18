@@ -4,6 +4,9 @@ import { AIActivityFlow } from '@/components/AIActivityFlow'
 import { fetchIncidents, fetchAlerts, resetWholeSystem } from '@/api/client'
 import type { Incident, Alert } from '@/types'
 
+const ALERT_ENGINE_URL = import.meta.env.VITE_ALERT_ENGINE_URL || 'http://localhost:8001'
+const STOREFRONT_URL = import.meta.env.VITE_STOREFRONT_URL || 'http://localhost:3000'
+
 export const OverviewPage: React.FC = () => {
   const [incidents, setIncidents] = React.useState<Incident[]>([])
   const [alerts, setAlerts] = React.useState<Alert[]>([])
@@ -209,20 +212,20 @@ export const OverviewPage: React.FC = () => {
           </div>
           <div className="flex flex-wrap gap-4 pt-2 text-xs">
             <a
-              href="http://localhost:8001"
+              href={ALERT_ENGINE_URL}
               target="_blank"
               rel="noreferrer"
               className="px-4 py-2 rounded-lg bg-zinc-100 text-black font-medium hover:bg-white transition-colors cursor-pointer"
             >
-              Trigger Incident on Alert Engine (Port 8001) →
+              Trigger Incident on Alert Engine →
             </a>
             <a
-              href="http://localhost:3000"
+              href={STOREFRONT_URL}
               target="_blank"
               rel="noreferrer"
               className="px-4 py-2 rounded-lg bg-zinc-900 text-zinc-300 border border-zinc-800 hover:text-white transition-colors cursor-pointer"
             >
-              Open Storefront (Port 3000) →
+              Open Storefront →
             </a>
           </div>
         </section>

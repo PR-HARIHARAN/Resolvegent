@@ -1,5 +1,8 @@
 import type { Incident, Alert, AuditEvent, MemoryRecord } from '@/types'
 
+const RAW_API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1'
+export const API_BASE = RAW_API_BASE.endsWith('/') ? RAW_API_BASE.slice(0, -1) : RAW_API_BASE
+
 export interface AgentStatusResponse {
   status: 'IDLE' | 'RUNNING' | 'COMPLETED' | 'FAILED'
   phase: string
@@ -10,7 +13,7 @@ export interface AgentStatusResponse {
 
 export async function fetchAlerts(): Promise<Alert[]> {
   try {
-    const res = await fetch('/api/v1/alerts')
+    const res = await fetch(`${API_BASE}/alerts`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
     return data.map((a: any) => ({
@@ -37,7 +40,7 @@ export async function fetchAlerts(): Promise<Alert[]> {
 
 export async function fetchIncidents(): Promise<Incident[]> {
   try {
-    const res = await fetch('/api/v1/incidents')
+    const res = await fetch(`${API_BASE}/incidents`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
     return data.map((inc: any) => ({
@@ -71,7 +74,7 @@ export async function fetchIncidents(): Promise<Incident[]> {
 
 export async function fetchIncidentById(id: string): Promise<Incident | null> {
   try {
-    const res = await fetch(`/api/v1/incidents/${id}`)
+    const res = await fetch(`${API_BASE}/incidents/${id}`)
     if (!res.ok) return null
     const inc = await res.json()
     return {
@@ -105,7 +108,7 @@ export async function fetchIncidentById(id: string): Promise<Incident | null> {
 
 export async function fetchAuditEvents(incidentId?: string): Promise<AuditEvent[]> {
   try {
-    const res = await fetch('/api/v1/audit/events')
+    const res = await fetch(`${API_BASE}/audit/events`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
     let list = data
@@ -130,7 +133,7 @@ export async function fetchAuditEvents(incidentId?: string): Promise<AuditEvent[
 
 export async function fetchMemoryRecords(): Promise<MemoryRecord[]> {
   try {
-    const res = await fetch('/api/v1/memory/records')
+    const res = await fetch(`${API_BASE}/memory/records`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
     return data.map((m: any, idx: number) => {
@@ -159,7 +162,7 @@ export async function fetchMemoryRecords(): Promise<MemoryRecord[]> {
 
 export async function deleteMemoryRecord(recordId: string): Promise<boolean> {
   try {
-    const res = await fetch(`/api/v1/memory/records/${encodeURIComponent(recordId)}`, {
+    const res = await fetch(`${API_BASE}/memory/records/${encodeURIComponent(recordId)}`, {
       method: 'DELETE',
     })
     return res.ok
@@ -171,7 +174,7 @@ export async function deleteMemoryRecord(recordId: string): Promise<boolean> {
 
 export async function clearAllMemoryRecords(): Promise<boolean> {
   try {
-    const res = await fetch('/api/v1/memory/records', {
+    const res = await fetch(`${API_BASE}/memory/records`, {
       method: 'DELETE',
     })
     return res.ok
@@ -183,7 +186,7 @@ export async function clearAllMemoryRecords(): Promise<boolean> {
 
 export async function fetchAgentStatus(): Promise<AgentStatusResponse> {
   try {
-    const res = await fetch('/api/v1/agent/status')
+    const res = await fetch(`${API_BASE}/agent/status`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return await res.json()
   } catch {
@@ -193,7 +196,7 @@ export async function fetchAgentStatus(): Promise<AgentStatusResponse> {
 
 export async function resetWholeSystem(): Promise<boolean> {
   try {
-    const res = await fetch('/api/v1/simulation/reset', {
+    const res = await fetch(`${API_BASE}/simulation/reset`, {
       method: 'POST',
     })
     return res.ok

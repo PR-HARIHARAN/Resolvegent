@@ -4,11 +4,25 @@
 
 ---
 
-## 🔄 Agent Loop Architecture (LangGraph + LangChain)
+## 📐 System Architecture & Workflow
+
+<p align="center">
+  <img src="docs/images/workflow_architecture.png" alt="Autonomous Enterprise Incident Resolution Engine Workflow" width="100%" />
+</p>
+
+*Figure 1: High-level event-driven architecture connecting Enterprise Applications, Alert MessageQueue, Asynchronous Agent Loop, Vector Knowledge Base, and Frontend Command Center.*
+
+---
+
+## 🔄 Agent Loop State Machine (LangGraph + LangChain)
 
 The core engine is orchestrated as a deterministic state machine via **LangGraph**, combining deterministic workflow control with autonomous LLM reasoning (**Qwen2.5:7b** + **BGE-M3** via local Ollama):
 
-![Agent Loop LangGraph Workflow](docs/images/agent_loop_graph.png)
+<p align="center">
+  <img src="docs/images/agent_loop_graph.png" alt="Agent Loop LangGraph Workflow" width="480" />
+</p>
+
+*Figure 2: LangGraph execution graph with cyclic investigation loop, human-in-the-loop checkpoint pause, and verification branches.*
 
 ```text
 MessageQueue (Alert Burst Ingestion)

@@ -28,14 +28,36 @@ def detect_trigger(state: AgentState) -> Dict[str, Any]:
 
 def correlate_alerts(state: AgentState) -> Dict[str, Any]:
     alerts = state.get("normalized_alerts", [])
-    services = list(set(get_attr_or_key(a, "service") for a in alerts))
+    services = list(set(get_attr_or_key(a, "service") for a in alerts)) if alerts else ["ecommerce-service"]
     severities = [get_attr_or_key(a, "severity") for a in alerts]
-    overall_sev = "P1" if "P1" in severities else "P2"
+    overall_sev = "P1" if "P1" in severities else ("P2" if "P2" in severities else "P3")
     alert_ids = [get_attr_or_key(a, "id") for a in alerts]
     
+    # Check if incoming alerts have a correlated incident ID from alert engine (e.g. INC-101, INC-202)
+    assigned_inc_id = None
+    for a in alerts:
+        cand = get_attr_or_key(a, "incidentId") or get_attr_or_key(a, "incident_id") or get_attr_or_key(a, "correlation_id")
+        if cand:
+            assigned_inc_id = str(cand)
+            break
+    if not assigned_inc_id:
+        assigned_inc_id = f"INC-{uuid.uuid4().hex[:4].upper()}"
+
+    # Build dynamic title based on primary alert and services
+    first_title = None
+    if alerts:
+        first_title = get_attr_or_key(alerts[0], "title")
+    if not first_title:
+        first_title = f"{services[0].replace('-', ' ').title()} Degradation"
+    
+    if len(alerts) > 1:
+        incident_title = f"{first_title} & Cascading Service Anomalies"
+    else:
+        incident_title = first_title
+    
     incident = Incident(
-        id=f"INC-{uuid.uuid4().hex[:4].upper()}",
-        title="Cascading Latency Spike & Connection Saturation across Payment Stack",
+        id=assigned_inc_id,
+        title=incident_title,
         severity=overall_sev,
         status="CORRELATED",
         affected_services=services,
@@ -49,10 +71,10 @@ def correlate_alerts(state: AgentState) -> Dict[str, Any]:
         actor="agent",
         action="Correlate Alerts into Incident",
         decision_reasoning=(
-            f"Grouped {len(alerts)} burst alerts occurring in 45s window across dependent services: {services}. "
-            "Identified payment-api 504s and redis saturation as symptoms of single cascading failure."
+            f"Grouped {len(alerts)} burst alerts occurring in correlation window across dependent services: {services}. "
+            f"Identified shared cascading root cause across {', '.join(services)}."
         ),
-        result=f"Created incident {incident.id} (Severity: {overall_sev})"
+        result=f"Created incident {incident.id}: '{incident_title}' (Severity: {overall_sev})"
     )
     return {
         "incident": incident,

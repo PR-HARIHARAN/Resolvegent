@@ -7,8 +7,11 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
+import requests
 from incident_engine.core.database import SessionLocal, get_db
 from incident_engine.core.models_db import IncidentDB, AlertDB, AuditEventDB
+from incident_engine.core.knowledge_base import kb_vectorstore
+from incident_engine.core.agent_runner import _active_agent_state
 from incident_engine.core.state import AgentState
 from incident_engine.agents.graph import graph
 from incident_engine.api.sse_manager import format_sse
@@ -30,6 +33,13 @@ async def start_simulation(request: SimulationStartRequest, db: Session = Depend
     alert_dicts = []
     for al in pending_alerts:
         al.status = "PROCESSING"
+        metric_val = None
+        if al.metricValue is not None:
+            try:
+                metric_val = float(al.metricValue)
+            except (ValueError, TypeError):
+                metric_val = None
+
         alert_dicts.append({
             "id": al.id,
             "timestamp": al.timestamp,
@@ -39,7 +49,7 @@ async def start_simulation(request: SimulationStartRequest, db: Session = Depend
             "message": al.summary,
             "source": al.source,
             "metric_name": al.metricName,
-            "metric_value": float(al.metricValue) if al.metricValue else None
+            "metric_value": metric_val
         })
     db.commit()
     
@@ -68,13 +78,32 @@ async def start_simulation(request: SimulationStartRequest, db: Session = Depend
 
 @router.post("/simulation/reset")
 async def reset_simulation(db: Session = Depends(get_db)):
+    # 1. Clear database tables
     db.query(AlertDB).delete()
     db.query(IncidentDB).delete()
     db.query(AuditEventDB).delete()
     db.commit()
+
+    # 2. Clear vector memory store
+    if hasattr(kb_vectorstore, "store") and kb_vectorstore.store:
+        kb_vectorstore.store.clear()
+
+    # 3. Reset active agent state
+    _active_agent_state["status"] = "IDLE"
+    _active_agent_state["phase"] = "IDLE"
+    _active_agent_state["current_incident_id"] = None
+    _active_agent_state["current_incident_title"] = None
+    _active_agent_state["last_updated"] = datetime.now(timezone.utc).isoformat()
+
+    # 4. Clear alert engine buffered alerts on port 8001 if reachable
+    try:
+        requests.post("http://localhost:8001/api/clear", timeout=2)
+    except Exception:
+        pass
+
     return {
         "status": "IDLE",
-        "message": "Simulation session and database reset successfully"
+        "message": "All data, alerts, incidents, memory, and audit events cleared successfully"
     }
 
 async def simulation_event_generator(session_id: str):

@@ -26,3 +26,4 @@ class AgentState(TypedDict):
     # Internal agent loop routing controls
     next_step_action: Optional[Literal["continue_investigation", "conclude_investigation"]]
     pending_tool_call: Optional[Dict[str, Any]]
+    auto_remediate: Optional[bool]

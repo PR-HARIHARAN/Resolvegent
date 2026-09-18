@@ -33,6 +33,7 @@ This document defines all REST and Server-Sent Events (SSE) streaming API endpoi
 | | `GET` | `/incidents/{id}/agents/{agent_id}/stream` | **SSE Stream**: Live diagnostic agent trace |
 | **Memory & Knowledge Base** | `GET` | `/memory/similar` | Vector similarity search for historical incidents |
 | | `GET` | `/memory/records` | List all historical postmortems and runbooks |
+| | `POST` | `/memory/records` | Add a new runbook or postmortem to the vector store |
 | **Audit Trail** | `GET` | `/audit/events` | Retrieve immutable cryptographically sequenced ledger |
 
 ---
@@ -199,12 +200,12 @@ Submits human operator approval to resume high-risk LangGraph checkpoint `interr
 ## 3. Real-Time Simulation & Agent Streaming API
 
 ### `POST /simulation/start`
-Starts the sequential autonomous incident lifecycle simulation from `Detecting` through `Verifying`.
+Starts the sequential autonomous incident lifecycle simulation from `Detecting` through `Verifying` for all currently ingested and pending alerts.
 
 #### Request Body:
 ```json
 {
-  "scenarioId": "POSTGRES_POOL_EXHAUSTION",
+  "scenarioId": "LIVE_ALERTS",
   "timeGapSeconds": 2.0,
   "autoRemediate": true
 }
@@ -296,7 +297,7 @@ Replays streaming tokens for a specific phase (e.g. `investigating`) on demand.
 ## 4. Alerts & Telemetry API
 
 ### `GET /alerts`
-Fetches inbound telemetry signals and alerts ingested from Datadog, Prometheus, CloudWatch, and PagerDuty.
+Fetches inbound telemetry signals and alerts ingested from external providers.
 
 #### Response: `200 OK`
 ```json
@@ -333,6 +334,35 @@ Fetches inbound telemetry signals and alerts ingested from Datadog, Prometheus, 
 ```
 
 ---
+
+### `POST /alerts/ingest`
+Ingests an array of alert payloads from external providers, storing them in the SQLite database as `RECEIVED`. These will be processed upon triggering `/simulation/start`.
+
+#### Request Body:
+```json
+[
+  {
+    "id": "ALR-9025",
+    "title": "High Latency Detected",
+    "source": "Datadog",
+    "severity": "HIGH",
+    "service": "payment-api",
+    "metricName": "latency_p99_ms",
+    "metricValue": "1450",
+    "threshold": "500",
+    "timestamp": "2026-09-18T11:42:00Z",
+    "summary": "P99 latency breached 500ms threshold."
+  }
+]
+```
+
+#### Response: `200 OK`
+```json
+{
+  "status": "success",
+  "count": 1
+}
+```
 
 ## 5. Investigation Sub-Agents API
 
@@ -408,6 +438,29 @@ Performs vector similarity search against the historical postmortem knowledge ba
     "postmortemSummary": "Rolling restart freed zombie connection leases in 42s with zero customer downtime."
   }
 ]
+```
+
+---
+
+### `POST /memory/records`
+Programmatically adds a new runbook or postmortem to the `InMemoryVectorStore` to act as RAG context for future incident investigations.
+
+#### Request Body:
+```json
+{
+  "doc_id": "RB-REDIS-01",
+  "category": "runbook",
+  "service": "payment-worker",
+  "content": "Redis connection exhaustion typically requires restarting the worker pods..."
+}
+```
+
+#### Response: `200 OK`
+```json
+{
+  "status": "success",
+  "doc_id": "RB-REDIS-01"
+}
 ```
 
 ---

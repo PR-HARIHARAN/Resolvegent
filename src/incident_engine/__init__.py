@@ -1,2 +1,3 @@
-def main() -> None:
-    print("Hello from incident-engine!")
+from incident_engine.api.main import main
+
+__all__ = ["main"]

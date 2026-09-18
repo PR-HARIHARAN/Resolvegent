@@ -1,0 +1,29 @@
+[project]
+name = "incident-engine"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "PR-HARIHARAN", email = "prhariharan2005@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "grandalf>=0.8",
+    "ipykernel>=7.3.0",
+    "langchain>=1.4.1",
+    "langchain-core>=1.6.3",
+    "langchain-ollama>=1.1.0",
+    "langgraph>=1.2.11",
+    "nbformat>=5.11.1",
+    "numpy>=2.5.3",
+    "pillow>=12.3.0",
+    "pydantic>=2.13.5",
+    "requests>=2.34.2",
+]
+
+[project.scripts]
+incident-engine = "incident_engine:main"
+
+[build-system]
+requires = ["uv_build>=0.12.4,<0.13.0"]
+build-backend = "uv_build"

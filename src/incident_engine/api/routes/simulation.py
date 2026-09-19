@@ -11,7 +11,7 @@ import requests
 from incident_engine.core.config import config as app_config
 from incident_engine.core.database import SessionLocal, get_db
 from incident_engine.core.models_db import IncidentDB, AlertDB, AuditEventDB
-from incident_engine.core.knowledge_base import kb_vectorstore
+from incident_engine.core.knowledge_base import kb_vectorstore, reset_knowledge_base
 from incident_engine.core.agent_runner import _active_agent_state
 from incident_engine.core.state import AgentState
 from incident_engine.agents.graph import graph
@@ -85,9 +85,8 @@ async def reset_simulation(db: Session = Depends(get_db)):
     db.query(AuditEventDB).delete()
     db.commit()
 
-    # 2. Clear vector memory store
-    if hasattr(kb_vectorstore, "store") and kb_vectorstore.store:
-        kb_vectorstore.store.clear()
+    # 2. Reset vector memory store to baseline runbooks
+    reset_knowledge_base()
 
     # 3. Reset active agent state
     _active_agent_state["status"] = "IDLE"

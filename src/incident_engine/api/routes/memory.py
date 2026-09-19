@@ -2,7 +2,7 @@ from typing import Optional
 from fastapi import APIRouter
 from pydantic import BaseModel
 from langchain_core.documents import Document
-from incident_engine.core.knowledge_base import kb_vectorstore
+from incident_engine.core.knowledge_base import kb_vectorstore, reset_knowledge_base
 
 router = APIRouter()
 
@@ -79,11 +79,11 @@ async def delete_memory_record(record_id: str):
 
 @router.delete("/memory/records")
 async def clear_all_memory():
-    """Clear all records from the neural vector store."""
+    """Reset all records in the vector store back to baseline runbooks."""
     count = 0
     if hasattr(kb_vectorstore, "store") and kb_vectorstore.store:
         count = len(kb_vectorstore.store)
-        kb_vectorstore.store.clear()
+    reset_knowledge_base()
     return {
         "status": "success",
         "cleared_count": count

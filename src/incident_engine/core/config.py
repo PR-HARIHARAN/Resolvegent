@@ -4,8 +4,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY") or os.getenv("groq_api") or os.getenv("GROQ_API") or ""
     LLM_MODEL = os.getenv("LLM_MODEL", "qwen-2.5-32b")
+    EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "lightweight").lower()
     EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5")
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./incidents.db")
     ALERT_ENGINE_URL = os.getenv("ALERT_ENGINE_URL", "http://localhost:8001")

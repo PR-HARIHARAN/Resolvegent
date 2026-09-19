@@ -5,7 +5,7 @@ import { fetchIncidents, fetchAlerts, resetWholeSystem } from '@/api/client'
 import type { Incident, Alert } from '@/types'
 
 const ALERT_ENGINE_URL = import.meta.env.VITE_ALERT_ENGINE_URL || 'https://ecommerce-alerts-sse2.onrender.com'
-const STOREFRONT_URL = import.meta.env.VITE_STOREFRONT_URL || 'http://localhost:3000'
+const STOREFRONT_URL = import.meta.env.VITE_STOREFRONT_URL || 'https://ecommerce-alerts-sse2.onrender.com/'
 
 export const OverviewPage: React.FC = () => {
   const [incidents, setIncidents] = React.useState<Incident[]>([])

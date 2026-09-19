@@ -4,7 +4,7 @@ import { fetchAlerts } from '@/api/client'
 import type { Alert } from '@/types'
 
 const ALERT_ENGINE_URL = import.meta.env.VITE_ALERT_ENGINE_URL || 'https://ecommerce-alerts-sse2.onrender.com'
-const STOREFRONT_URL = import.meta.env.VITE_STOREFRONT_URL || 'http://localhost:3000'
+const STOREFRONT_URL = import.meta.env.VITE_STOREFRONT_URL || 'https://ecommerce-alerts-sse2.onrender.com/'
 
 export const AlertsPage: React.FC = () => {
   const [alerts, setAlerts] = React.useState<Alert[]>([])

@@ -1009,8 +1009,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     </div>
 
     <nav class="nav-links">
-      <a href="http://localhost:5173/overview" target="_blank" class="btn btn-primary">
-        ⚡ Command Center (Port 5173) ↗
+      <a href="https://resolvegent.vercel.app/overview" target="_blank" class="btn btn-primary">
+        ⚡ Command Center ↗
       </a>
       <a href="http://localhost:3000" target="_blank" class="btn">
         🛍️ Storefront (3000)

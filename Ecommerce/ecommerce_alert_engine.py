@@ -1012,8 +1012,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       <a href="https://resolvegent.vercel.app/overview" target="_blank" class="btn btn-primary">
         ⚡ Command Center ↗
       </a>
-      <a href="http://localhost:3000" target="_blank" class="btn">
-        🛍️ Storefront (3000)
+      <a href="https://src-one-beige-69.vercel.app/" target="_blank" class="btn">
+        🛍️ Storefront ↗
       </a>
       <a href="/api/alerts" target="_blank" class="btn" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
         GET /api/alerts

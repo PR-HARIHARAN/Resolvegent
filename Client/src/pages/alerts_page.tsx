@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { fetchAlerts } from '@/api/client'
 import type { Alert } from '@/types'
 
-const ALERT_ENGINE_URL = import.meta.env.VITE_ALERT_ENGINE_URL || 'http://localhost:8001'
+const ALERT_ENGINE_URL = import.meta.env.VITE_ALERT_ENGINE_URL || 'https://ecommerce-alerts-sse2.onrender.com'
 const STOREFRONT_URL = import.meta.env.VITE_STOREFRONT_URL || 'http://localhost:3000'
 
 export const AlertsPage: React.FC = () => {

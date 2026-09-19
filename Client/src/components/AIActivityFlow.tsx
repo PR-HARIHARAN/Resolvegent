@@ -2,7 +2,7 @@ import * as React from 'react'
 import { fetchAuditEvents, fetchAgentStatus, type AgentStatusResponse } from '@/api/client'
 import type { AuditEvent } from '@/types'
 
-const ALERT_ENGINE_URL = import.meta.env.VITE_ALERT_ENGINE_URL || 'http://localhost:8001'
+const ALERT_ENGINE_URL = import.meta.env.VITE_ALERT_ENGINE_URL || 'https://ecommerce-alerts-sse2.onrender.com'
 
 interface AIActivityFlowProps {
   onSimulationStatusChange?: (

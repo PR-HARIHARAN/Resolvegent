@@ -1575,7 +1575,17 @@ async def handle_http_request(reader: asyncio.StreamReader, writer: asyncio.Stre
         # ENDPOINT 11: Interactive Dashboard UI
         # ----------------------------------------------------------------------
         elif path in ("/", "/dashboard"):
-            body = DASHBOARD_HTML.encode("utf-8")
+            cmd_center = os.environ.get("COMMAND_CENTER_URL", "http://localhost:5173/overview")
+            storefront = os.environ.get("STOREFRONT_URL", "http://localhost:3000")
+            html_content = DASHBOARD_HTML.replace("http://localhost:5173/overview", cmd_center)
+            html_content = html_content.replace("http://localhost:3000", storefront)
+            
+            # Update the navigation text if running in production
+            if "vercel.app" in cmd_center:
+                html_content = html_content.replace("(Port 5173)", "")
+                html_content = html_content.replace("(3000)", "")
+                
+            body = html_content.encode("utf-8")
             writer.write(b"HTTP/1.1 200 OK\r\n")
             writer.write(b"Content-Type: text/html; charset=utf-8\r\n")
             writer.write(b"Access-Control-Allow-Origin: *\r\n")
@@ -1587,10 +1597,12 @@ async def handle_http_request(reader: asyncio.StreamReader, writer: asyncio.Stre
         # ENDPOINT 12: API Discovery & Documentation Index
         # ----------------------------------------------------------------------
         else:
+            api_url = os.environ.get("BACKEND_URL", "http://localhost:8000/api/v1/alerts/ingest")
             info = {
                 "service": "ecommerce-alert-engine",
                 "status": "ONLINE",
-                "dashboard": "http://localhost:8000/",
+                "dashboard": os.environ.get("COMMAND_CENTER_URL", "http://localhost:5173"),
+                "connected_backend": api_url,
                 "api_endpoints": {
                     "/api/alerts": "Queryable JSON alerts log (?limit=50&severity=CRITICAL&category=PAYMENT&incident_id=INC-202&since=TIMESTAMP)",
                     "/api/alerts/raw": "Raw NDJSON alerts.jsonl file stream",

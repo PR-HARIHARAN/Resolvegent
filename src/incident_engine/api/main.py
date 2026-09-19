@@ -32,6 +32,15 @@ app.include_router(agents.router, prefix="/api/v1", tags=["Agents"])
 app.include_router(memory.router, prefix="/api/v1", tags=["Memory"])
 app.include_router(audit.router, prefix="/api/v1", tags=["Audit"])
 
+@app.get("/")
+def read_root():
+    return {
+        "service": "Resolvegent Core Backend API",
+        "status": "🟢 ONLINE",
+        "health_check": "/api/v1/health",
+        "documentation": "/docs"
+    }
+
 def main():
     import uvicorn
     uvicorn.run("incident_engine.api.main:app", host="0.0.0.0", port=8000, reload=True)

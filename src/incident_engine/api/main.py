@@ -28,7 +28,7 @@ def read_root():
     return {
         "service": "Resolvegent Core Backend API",
         "message": "Resolvegent Autonomous Incident Engine API is online.",
-        "status": "🟢 ONLINE",
+        "status": "ONLINE",
         "health_check": "/api/v1/health",
         "documentation": "/docs",
         "version": "0.1.0"

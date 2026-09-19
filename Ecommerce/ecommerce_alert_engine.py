@@ -992,7 +992,6 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   </style>
 </head>
 <body>
-  <!-- Port 5173 Style Top Navigation Header -->
   <header class="top-header">
     <div style="display: flex; align-items: center; gap: 14px;">
       <a href="/" class="brand-container" title="Resolvegent Alert Engine">
@@ -1004,15 +1003,15 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       </a>
       <span class="header-status-badge">
         <span class="pulse-dot"></span>
-        Alert Engine 8001 Live
+        Alert Engine Live
       </span>
     </div>
 
     <nav class="nav-links">
-      <a href="https://resolvegent.vercel.app/overview" target="_blank" class="btn btn-primary">
+      <a href="{{COMMAND_CENTER_URL}}" target="_blank" class="btn btn-primary">
         ⚡ Command Center ↗
       </a>
-      <a href="https://src-one-beige-69.vercel.app/" target="_blank" class="btn">
+      <a href="{{STOREFRONT_URL}}" target="_blank" class="btn">
         🛍️ Storefront ↗
       </a>
       <a href="/api/alerts" target="_blank" class="btn" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
@@ -1575,7 +1574,12 @@ async def handle_http_request(reader: asyncio.StreamReader, writer: asyncio.Stre
         # ENDPOINT 11: Interactive Dashboard UI
         # ----------------------------------------------------------------------
         elif path in ("/", "/dashboard"):
-            body = DASHBOARD_HTML.encode("utf-8")
+            cmd_center = os.environ.get("COMMAND_CENTER_URL", "https://resolvegent.vercel.app/overview")
+            storefront = os.environ.get("STOREFRONT_URL", "https://src-one-beige-69.vercel.app/")
+            html_content = DASHBOARD_HTML.replace("{{COMMAND_CENTER_URL}}", cmd_center)
+            html_content = html_content.replace("{{STOREFRONT_URL}}", storefront)
+                
+            body = html_content.encode("utf-8")
             writer.write(b"HTTP/1.1 200 OK\r\n")
             writer.write(b"Content-Type: text/html; charset=utf-8\r\n")
             writer.write(b"Access-Control-Allow-Origin: *\r\n")
@@ -1587,10 +1591,12 @@ async def handle_http_request(reader: asyncio.StreamReader, writer: asyncio.Stre
         # ENDPOINT 12: API Discovery & Documentation Index
         # ----------------------------------------------------------------------
         else:
+            api_url = os.environ.get("BACKEND_URL", "https://resolvegent-2.onrender.com/api/v1/alerts/ingest")
             info = {
                 "service": "ecommerce-alert-engine",
                 "status": "ONLINE",
-                "dashboard": "http://localhost:8000/",
+                "dashboard": os.environ.get("COMMAND_CENTER_URL", "https://resolvegent.vercel.app/overview"),
+                "connected_backend": api_url,
                 "api_endpoints": {
                     "/api/alerts": "Queryable JSON alerts log (?limit=50&severity=CRITICAL&category=PAYMENT&incident_id=INC-202&since=TIMESTAMP)",
                     "/api/alerts/raw": "Raw NDJSON alerts.jsonl file stream",

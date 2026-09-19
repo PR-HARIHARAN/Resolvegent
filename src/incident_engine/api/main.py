@@ -24,12 +24,13 @@ app.add_middleware(
 )
 
 @app.get("/", tags=["Root"])
-async def root():
+def read_root():
     return {
+        "service": "Resolvegent Core Backend API",
         "message": "Resolvegent Autonomous Incident Engine API is online.",
-        "status": "healthy",
-        "docs": "/docs",
-        "health": "/api/v1/health",
+        "status": "🟢 ONLINE",
+        "health_check": "/api/v1/health",
+        "documentation": "/docs",
         "version": "0.1.0"
     }
 
@@ -41,6 +42,7 @@ app.include_router(alerts.router, prefix="/api/v1", tags=["Alerts"])
 app.include_router(agents.router, prefix="/api/v1", tags=["Agents"])
 app.include_router(memory.router, prefix="/api/v1", tags=["Memory"])
 app.include_router(audit.router, prefix="/api/v1", tags=["Audit"])
+
 
 def main():
     import uvicorn

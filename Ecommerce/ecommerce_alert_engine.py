@@ -992,7 +992,6 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   </style>
 </head>
 <body>
-  <!-- Port 5173 Style Top Navigation Header -->
   <header class="top-header">
     <div style="display: flex; align-items: center; gap: 14px;">
       <a href="/" class="brand-container" title="Resolvegent Alert Engine">
@@ -1004,16 +1003,16 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       </a>
       <span class="header-status-badge">
         <span class="pulse-dot"></span>
-        Alert Engine 8001 Live
+        Alert Engine Live
       </span>
     </div>
 
     <nav class="nav-links">
-      <a href="http://localhost:5173/overview" target="_blank" class="btn btn-primary">
-        ⚡ Command Center (Port 5173) ↗
+      <a href="{{COMMAND_CENTER_URL}}" target="_blank" class="btn btn-primary">
+        ⚡ Command Center ↗
       </a>
-      <a href="http://localhost:3000" target="_blank" class="btn">
-        🛍️ Storefront (3000)
+      <a href="{{STOREFRONT_URL}}" target="_blank" class="btn">
+        🛍️ Storefront ↗
       </a>
       <a href="/api/alerts" target="_blank" class="btn" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
         GET /api/alerts
@@ -1577,13 +1576,8 @@ async def handle_http_request(reader: asyncio.StreamReader, writer: asyncio.Stre
         elif path in ("/", "/dashboard"):
             cmd_center = os.environ.get("COMMAND_CENTER_URL", "http://localhost:5173/overview")
             storefront = os.environ.get("STOREFRONT_URL", "http://localhost:3000")
-            html_content = DASHBOARD_HTML.replace("http://localhost:5173/overview", cmd_center)
-            html_content = html_content.replace("http://localhost:3000", storefront)
-            
-            # Update the navigation text if running in production
-            if "vercel.app" in cmd_center:
-                html_content = html_content.replace("(Port 5173)", "")
-                html_content = html_content.replace("(3000)", "")
+            html_content = DASHBOARD_HTML.replace("{{COMMAND_CENTER_URL}}", cmd_center)
+            html_content = html_content.replace("{{STOREFRONT_URL}}", storefront)
                 
             body = html_content.encode("utf-8")
             writer.write(b"HTTP/1.1 200 OK\r\n")

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const ALERT_ENGINE_URL = 'http://localhost:8001';
-const COMMAND_CENTER_URL = 'http://localhost:5173/overview';
+const ALERT_ENGINE_URL = process.env.REACT_APP_ALERT_ENGINE_URL || 'https://ecommerce-alerts-sse2.onrender.com';
+const COMMAND_CENTER_URL = process.env.REACT_APP_COMMAND_CENTER_URL || 'https://resolvegent.vercel.app/overview';
 
 export default function AlertNotificationOverlay() {
   const [alerts, setAlerts] = useState([]);

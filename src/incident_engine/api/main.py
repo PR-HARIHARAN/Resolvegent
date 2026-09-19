@@ -23,6 +23,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/", tags=["Root"])
+async def root():
+    return {
+        "message": "Resolvegent Autonomous Incident Engine API is online.",
+        "status": "healthy",
+        "docs": "/docs",
+        "health": "/api/v1/health",
+        "version": "0.1.0"
+    }
+
 # Include routers
 app.include_router(health.router, prefix="/api/v1", tags=["Health"])
 app.include_router(incidents.router, prefix="/api/v1", tags=["Incidents"])
